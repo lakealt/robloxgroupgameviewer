@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Roblox Group Game Viewer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            transition: background 1s ease, color 0.5s ease;
             background: #000;
             color: #fff;
-            text-align: center;
             margin: 0;
             padding: 0;
         }
         h1 {
             margin-top: 20px;
+            font-size: 24px;
         }
         .controls {
             margin: 20px auto;
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             gap: 10px;
-            flex-wrap: wrap;
         }
-        input, button {
+        input, button, select {
             padding: 10px;
             border-radius: 6px;
             border: none;
@@ -30,7 +32,7 @@
         input[type="text"] {
             width: 240px;
         }
-        button {
+        button, select {
             cursor: pointer;
         }
         #gamesContainer {
@@ -45,7 +47,8 @@
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-            width: 300px;
+            width: 90%;
+            max-width: 300px;
             text-align: left;
         }
         .gameCard h2 {
@@ -59,7 +62,7 @@
         }
         #pinnedGroupsContainer {
             margin: 30px auto;
-            width: 80%;
+            width: 90%;
             max-width: 700px;
         }
         #pinnedGroupsList {
@@ -77,10 +80,6 @@
             font-family: monospace;
             color: #fff;
             box-shadow: 0 0 5px rgba(255,255,255,0.1);
-        }
-        .pinnedItem button {
-            padding: 4px 10px;
-            border-radius: 6px;
         }
         .btn-blue {
             background-color: #4b9bff;
@@ -104,6 +103,18 @@
             <button onclick="pinCurrentGroup()">📌 Pin Group</button>
         </div>
         <button onclick="toggleTheme()">🌙 Toggle Theme</button>
+        <select onchange="changeBackground(this.value)">
+            <option value="default">🎨 Default</option>
+            <option value="purplePink">💜 Purple → Pink</option>
+            <option value="pinkOrange">🧡 Pink → Orange</option>
+            <option value="blueCyan">💙 Blue → Cyan</option>
+            <option value="violetRed">💖 Violet → Red</option>
+            <option value="mintTeal">🌿 Mint → Teal</option>
+            <option value="lavaFire">🔥 Lava → Fire</option>
+            <option value="galaxy">🌌 Galaxy Fade</option>
+            <option value="sunset">🌅 Sunset Blend</option>
+            <option value="forest">🌲 Forest Calm</option>
+        </select>
     </div>
     <div class="controls">
         <input type="text" id="searchInput" placeholder="Search games..." oninput="searchGames()">
@@ -115,6 +126,18 @@
     <div id="gamesContainer">No games found for this group.</div>
     <script>
         let currentGroupId = '';
+        const gradients = {
+            default: "linear-gradient(to right, #000000, #000000)",
+            purplePink: "linear-gradient(to right, #6a11cb, #2575fc)",
+            pinkOrange: "linear-gradient(to right, #ff6a00, #ee0979)",
+            blueCyan: "linear-gradient(to right, #2193b0, #6dd5ed)",
+            violetRed: "linear-gradient(to right, #8e2de2, #ff6a00)",
+            mintTeal: "linear-gradient(to right, #43e97b, #38f9d7)",
+            lavaFire: "linear-gradient(to right, #ff512f, #dd2476)",
+            galaxy: "linear-gradient(to right, #20002c, #cbb4d4)",
+            sunset: "linear-gradient(to right, #f12711, #f5af19)",
+            forest: "linear-gradient(to right, #5a3f37, #2c7744)"
+        };
         function getPinnedGroups() {
             return JSON.parse(localStorage.getItem('pinnedGroups') || '[]');
         }
@@ -153,7 +176,7 @@
                 const div = document.createElement('div');
                 div.className = 'pinnedItem';
                 div.innerHTML = `
-                    <span>[${index + 1}] &lt;!DOCTYPE html&gt;</span>
+                    <span>[${index + 1}] Group ID: ${id}</span>
                     <div>
                         <button class="btn-blue" onclick="loadPinnedGroup('${id}')">View</button>
                         <button class="btn-red" onclick="unpinGroup('${id}')">🗑️</button>
@@ -164,9 +187,26 @@
         }
         function toggleTheme() {
             const body = document.body;
-            const isDark = body.style.background === 'black' || body.style.background === '#000';
-            body.style.background = isDark ? '#fff' : '#000';
+            const isDark = body.dataset.theme !== 'light';
+            body.dataset.theme = isDark ? 'light' : 'dark';
             body.style.color = isDark ? '#000' : '#fff';
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        }
+        function changeBackground(value) {
+            const bg = gradients[value] || gradients.default;
+            document.body.style.background = bg;
+            localStorage.setItem('selectedGradient', value);
+        }
+        function applySavedSettings() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.dataset.theme = 'light';
+                document.body.style.color = '#000';
+            }
+            const savedGradient = localStorage.getItem('selectedGradient') || 'default';
+            changeBackground(savedGradient);
+            const dropdown = document.querySelector("select");
+            if (dropdown) dropdown.value = savedGradient;
         }
         function searchGames() {
             const input = document.getElementById('searchInput').value.toLowerCase();
@@ -214,10 +254,10 @@
                 container.innerHTML = 'Error loading games. Please try again later.';
             }
         }
-        // Initialize pinned groups on load
         window.onload = () => {
+            applySavedSettings();
             renderPinnedGroups();
-            fetchGames(); // Auto-load last entered group if any
+            fetchGames();
         };
     </script>
 </body>
