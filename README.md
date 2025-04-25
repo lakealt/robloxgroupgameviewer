@@ -92,9 +92,38 @@
         #pinGroupWrapper {
             display: none;
         }
+        #gradientPreview {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+        }
+        .gradient-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            transition: transform 0.2s ease;
+        }
+        .gradient-option:hover {
+            transform: scale(1.2);
+        }
+        #adminPanel {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 10px;
+            font-size: 14px;
+            z-index: 9999;
+        }
     </style>
 </head>
-<body>
+<body ondblclick="toggleAdminPanel()">
     <h1>Roblox Group Game Viewer</h1>
     <div class="controls">
         <input type="text" id="groupIdInput" placeholder="Enter Group ID">
@@ -114,8 +143,12 @@
             <option value="galaxy">🌌 Galaxy Fade</option>
             <option value="sunset">🌅 Sunset Blend</option>
             <option value="forest">🌲 Forest Calm</option>
+            <option value="deepOcean">🌊 Deep Ocean</option>
+            <option value="aurora">✨ Aurora Lights</option>
+            <option value="neonCity">🌃 Neon City</option>
         </select>
     </div>
+    <div id="gradientPreview"></div>
     <div class="controls">
         <input type="text" id="searchInput" placeholder="Search games..." oninput="searchGames()">
     </div>
@@ -124,6 +157,12 @@
         <div id="pinnedGroupsList"></div>
     </div>
     <div id="gamesContainer">No games found for this group.</div>
+    <div id="adminPanel">
+        <p><strong>Admin Panel</strong></p>
+        <button onclick="localStorage.clear();location.reload();">🧹 Clear Cache</button>
+        <p>Theme: <span id="currentTheme"></span></p>
+        <p>Gradient: <span id="currentGradient"></span></p>
+    </div>
     <script>
         let currentGroupId = '';
         const gradients = {
@@ -136,8 +175,17 @@
             lavaFire: "linear-gradient(to right, #ff512f, #dd2476)",
             galaxy: "linear-gradient(to right, #20002c, #cbb4d4)",
             sunset: "linear-gradient(to right, #f12711, #f5af19)",
-            forest: "linear-gradient(to right, #5a3f37, #2c7744)"
+            forest: "linear-gradient(to right, #5a3f37, #2c7744)",
+            deepOcean: "linear-gradient(to right, #2C3E50, #4CA1AF)",
+            aurora: "linear-gradient(to right, #00c6ff, #0072ff)",
+            neonCity: "linear-gradient(to right, #8e44ad, #3498db)"
         };
+        function toggleAdminPanel() {
+            const admin = document.getElementById('adminPanel');
+            admin.style.display = admin.style.display === 'none' ? 'block' : 'none';
+            document.getElementById('currentTheme').textContent = localStorage.getItem('theme');
+            document.getElementById('currentGradient').textContent = localStorage.getItem('selectedGradient');
+        }
         function getPinnedGroups() {
             return JSON.parse(localStorage.getItem('pinnedGroups') || '[]');
         }
@@ -208,6 +256,20 @@
             const dropdown = document.querySelector("select");
             if (dropdown) dropdown.value = savedGradient;
         }
+        function previewGradients() {
+            const preview = document.getElementById('gradientPreview');
+            Object.keys(gradients).forEach(key => {
+                const swatch = document.createElement('div');
+                swatch.className = 'gradient-option';
+                swatch.style.background = gradients[key];
+                swatch.title = key;
+                swatch.onclick = () => {
+                    changeBackground(key);
+                    document.querySelector("select").value = key;
+                };
+                preview.appendChild(swatch);
+            });
+        }
         function searchGames() {
             const input = document.getElementById('searchInput').value.toLowerCase();
             const cards = document.querySelectorAll('.gameCard');
@@ -257,6 +319,7 @@
         window.onload = () => {
             applySavedSettings();
             renderPinnedGroups();
+            previewGradients();
             fetchGames();
         };
     </script>
