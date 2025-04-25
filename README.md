@@ -3,21 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Roblox Group Game Viewer</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        :root {
+            --bg-color: #0f0f0f;
+            --text-color: #ffffff;
+            --card-bg: #151515;
+            --accent-color: #7a5cff;
+        }
+        [data-theme="light"] {
+            --bg-color: #f4f4f4;
+            --text-color: #111;
+            --card-bg: #ffffff;
+            --accent-color: #4b9bff;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to right, #0f0f0f, #1e1e1e);
-            color: #f1f1f1;
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: background 0.3s ease, color 0.3s ease;
+            padding: 40px 20px;
+            margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px 20px;
-            margin: 0;
         }
         h1 {
             font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: #7a5cff;
+            margin-bottom: 10px;
+        }
+        .controls {
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
         }
         input[type="text"] {
             padding: 12px 16px;
@@ -25,22 +45,30 @@
             border: none;
             border-radius: 10px;
             width: 250px;
-            max-width: 90%;
-            margin-right: 10px;
             outline: none;
         }
         button {
             padding: 12px 20px;
             font-size: 1rem;
-            background: linear-gradient(135deg, #4b9bff, #7a5cff);
+            background: linear-gradient(135deg, var(--accent-color), #4b9bff);
             border: none;
             border-radius: 10px;
             color: white;
             cursor: pointer;
-            transition: 0.3s;
+            transition: transform 0.2s ease;
         }
         button:hover {
-            opacity: 0.85;
+            transform: scale(1.05);
+        }
+        #themeToggle {
+            background: transparent;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         #gamesContainer {
             display: grid;
@@ -48,54 +76,65 @@
             gap: 20px;
             width: 100%;
             max-width: 1200px;
-            margin-top: 30px;
         }
-
         .gameCard {
-            background: #151515;
+            background: var(--card-bg);
             padding: 20px;
             border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.4s forwards;
         }
-
         .gameCard:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 30px rgba(122, 92, 255, 0.2);
         }
-
         .gameCard h2 {
             margin-top: 0;
-            font-size: 1.5rem;
-            color: #4b9bff;
+            font-size: 1.4rem;
+            color: var(--accent-color);
         }
-
         .gameCard p {
             font-size: 0.95rem;
-            margin: 10px 0;
         }
-
         .gameCard a {
             display: inline-block;
             margin-top: 10px;
-            color: #7a5cff;
+            color: var(--accent-color);
             font-weight: bold;
             text-decoration: none;
         }
-
         .gameCard a:hover {
             text-decoration: underline;
         }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
-<body>
+<body data-theme="dark">
     <h1>Roblox Group Game Viewer</h1>
-    <div>
+    <div class="controls">
         <input type="text" id="groupIdInput" placeholder="Enter Group ID">
         <button onclick="fetchGames()">Fetch Games</button>
+        <button id="themeToggle" onclick="toggleTheme()">
+            <i data-lucide="moon"></i>
+            Toggle Theme
+        </button>
     </div>
     <div id="gamesContainer">No games found for this group.</div>
     <script>
+        lucide.createIcons();
+        function toggleTheme() {
+            const body = document.body;
+            const current = body.getAttribute("data-theme");
+            body.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+        }
         async function fetchGames() {
             const groupId = document.getElementById('groupIdInput').value;
             const container = document.getElementById('gamesContainer');
@@ -126,7 +165,8 @@
                 container.innerHTML = 'Error loading games. Please try again later.';
             }
         }
-        // Optional: auto-fetch on load with default group
+
+        // Optional: Auto-fetch on page load
         // window.onload = fetchGames;
     </script>
 </body>
