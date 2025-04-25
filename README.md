@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -22,8 +22,8 @@
             background: var(--bg-color);
             color: var(--text-color);
             transition: background 0.3s ease, color 0.3s ease;
-            padding: 40px 20px;
             margin: 0;
+            padding: 40px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -33,7 +33,7 @@
             margin-bottom: 10px;
         }
         .controls {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -46,6 +46,9 @@
             border-radius: 10px;
             width: 250px;
             outline: none;
+        }
+        #searchFilter {
+            width: 300px;
         }
         button {
             padding: 12px 20px;
@@ -76,6 +79,7 @@
             gap: 20px;
             width: 100%;
             max-width: 1200px;
+            margin-top: 20px;
         }
         .gameCard {
             background: var(--card-bg);
@@ -83,8 +87,6 @@
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            opacity: 0;
-            transform: translateY(10px);
             animation: fadeInUp 0.4s forwards;
         }
         .gameCard:hover {
@@ -110,45 +112,90 @@
             text-decoration: underline;
         }
         @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
+        #loadingSpinner {
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid var(--accent-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #noGames {
+            font-size: 1.2rem;
+            margin-top: 30px;
+            opacity: 0.7;
+        }
     </style>
 </head>
-<body data-theme="dark">
+<body>
     <h1>Roblox Group Game Viewer</h1>
     <div class="controls">
         <input type="text" id="groupIdInput" placeholder="Enter Group ID">
         <button onclick="fetchGames()">Fetch Games</button>
         <button id="themeToggle" onclick="toggleTheme()">
-            <i data-lucide="moon"></i>
-            Toggle Theme
+            <i data-lucide="moon"></i> Toggle Theme
         </button>
     </div>
-    <div id="gamesContainer">No games found for this group.</div>
+    <div class="controls">
+        <input type="text" id="searchFilter" onkeyup="filterGames()" placeholder="Search games...">
+    </div>
+    <div id="gamesContainer">
+        <div id="noGames">No games found for this group.</div>
+    </div>
+    <div id="loadingSpinner" style="display:none;"></div>
     <script>
         lucide.createIcons();
+        // Theme toggle with persistence
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', currentTheme);
         function toggleTheme() {
             const body = document.body;
-            const current = body.getAttribute("data-theme");
-            body.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+            const theme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+        function filterGames() {
+            const filter = document.getElementById('searchFilter').value.toLowerCase();
+            const cards = document.querySelectorAll('.gameCard');
+            cards.forEach(card => {
+                const title = card.querySelector('h2').textContent.toLowerCase();
+                card.style.display = title.includes(filter) ? 'block' : 'none';
+            });
         }
         async function fetchGames() {
             const groupId = document.getElementById('groupIdInput').value;
             const container = document.getElementById('gamesContainer');
-            container.innerHTML = 'Loading...';
+            const spinner = document.getElementById('loadingSpinner');
+            const noGames = document.getElementById('noGames');
+            container.innerHTML = '';
+            spinner.style.display = 'block';
             try {
                 const response = await fetch(`https://mskswokcev.devrahsanko.workers.dev/?groupId=${groupId}`);
                 if (!response.ok) throw new Error('Failed to fetch data');
                 const data = await response.json();
                 const games = data.games || [];
+                spinner.style.display = 'none';
                 if (games.length === 0) {
-                    container.innerHTML = 'No games found for this group.';
+                    container.innerHTML = '';
+                    container.appendChild(noGames);
+                    noGames.style.display = 'block';
                     return;
                 }
-                container.innerHTML = '';
+                noGames.style.display = 'none';
                 games.forEach(game => {
                     const { name, description, rootPlaceId } = game;
                     const card = document.createElement('div');
@@ -162,12 +209,10 @@
                 });
             } catch (error) {
                 console.error('Error fetching games:', error);
-                container.innerHTML = 'Error loading games. Please try again later.';
+                spinner.style.display = 'none';
+                container.innerHTML = '<div id="noGames">Error loading games. Please try again later.</div>';
             }
         }
-
-        // Optional: Auto-fetch on page load
-        // window.onload = fetchGames;
     </script>
 </body>
 </html>
