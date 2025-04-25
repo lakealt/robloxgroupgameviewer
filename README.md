@@ -1,143 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
     <title>Roblox Group Game Viewer</title>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root {
-            --bg-color: #0f0f0f;
-            --text-color: #ffffff;
-            --card-bg: #151515;
-            --accent-color: #7a5cff;
-        }
-        [data-theme="light"] {
-            --bg-color: #f4f4f4;
-            --text-color: #111;
-            --card-bg: #ffffff;
-            --accent-color: #4b9bff;
-        }
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--bg-color);
-            color: var(--text-color);
-            transition: background 0.3s ease, color 0.3s ease;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            text-align: center;
             margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 0;
         }
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        .controls {
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 10px;
-        }
-        input[type="text"] {
-            padding: 12px 16px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 10px;
-            width: 250px;
-            outline: none;
-        }
-        #searchFilter {
-            width: 300px;
-        }
-        button {
-            padding: 12px 20px;
-            font-size: 1rem;
-            background: linear-gradient(135deg, var(--accent-color), #4b9bff);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        button:hover {
-            transform: scale(1.05);
-        }
-        #themeToggle {
-            background: transparent;
-            border: 2px solid var(--accent-color);
-            color: var(--accent-color);
-            padding: 10px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        #gamesContainer {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 1200px;
             margin-top: 20px;
         }
-        .gameCard {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            animation: fadeInUp 0.4s forwards;
+        .controls {
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        .gameCard:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(122, 92, 255, 0.2);
+        input, button {
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            font-size: 16px;
+        }
+        input[type="text"] {
+            width: 240px;
+        }
+        button {
+            cursor: pointer;
+        }
+        #gamesContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .gameCard {
+            background: #111;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            width: 300px;
+            text-align: left;
         }
         .gameCard h2 {
+            color: #7a5cff;
             margin-top: 0;
-            font-size: 1.4rem;
-            color: var(--accent-color);
         }
-        .gameCard p {
-            font-size: 0.95rem;
-        }
-        .gameCard a {
-            display: inline-block;
-            margin-top: 10px;
-            color: var(--accent-color);
-            font-weight: bold;
+        a {
+            color: #4b9bff;
             text-decoration: none;
+            font-weight: bold;
         }
-        .gameCard a:hover {
-            text-decoration: underline;
-        }
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        #loadingSpinner {
-            border: 5px solid rgba(255, 255, 255, 0.1);
-            border-top: 5px solid var(--accent-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+        #pinnedGroupsContainer {
             margin: 30px auto;
+            width: 80%;
+            max-width: 700px;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        #pinnedGroupsList {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-        #noGames {
-            font-size: 1.2rem;
-            margin-top: 30px;
-            opacity: 0.7;
+        .pinnedItem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #111;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            color: #fff;
+            box-shadow: 0 0 5px rgba(255,255,255,0.1);
+        }
+        .pinnedItem button {
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+        .btn-blue {
+            background-color: #4b9bff;
+            color: white;
+        }
+        .btn-red {
+            background-color: #ff4b4b;
+            color: white;
+        }
+        #pinGroupWrapper {
+            display: none;
         }
     </style>
 </head>
@@ -145,57 +99,105 @@
     <h1>Roblox Group Game Viewer</h1>
     <div class="controls">
         <input type="text" id="groupIdInput" placeholder="Enter Group ID">
-        <button onclick="fetchGames()">Fetch Games</button>
-        <button id="themeToggle" onclick="toggleTheme()">
-            <i data-lucide="moon"></i> Toggle Theme
-        </button>
+        <button class="btn-blue" onclick="fetchGames()">Fetch Games</button>
+        <div id="pinGroupWrapper">
+            <button onclick="pinCurrentGroup()">📌 Pin Group</button>
+        </div>
+        <button onclick="toggleTheme()">🌙 Toggle Theme</button>
     </div>
     <div class="controls">
-        <input type="text" id="searchFilter" onkeyup="filterGames()" placeholder="Search games...">
+        <input type="text" id="searchInput" placeholder="Search games..." oninput="searchGames()">
     </div>
-    <div id="gamesContainer">
-        <div id="noGames">No games found for this group.</div>
+    <div id="pinnedGroupsContainer">
+        <h3>Pinned Groups</h3>
+        <div id="pinnedGroupsList"></div>
     </div>
-    <div id="loadingSpinner" style="display:none;"></div>
+    <div id="gamesContainer">No games found for this group.</div>
     <script>
-        lucide.createIcons();
-        // Theme toggle with persistence
-        const currentTheme = localStorage.getItem('theme') || 'dark';
-        document.body.setAttribute('data-theme', currentTheme);
+        let currentGroupId = '';
+        function getPinnedGroups() {
+            return JSON.parse(localStorage.getItem('pinnedGroups') || '[]');
+        }
+        function setPinnedGroups(groups) {
+            localStorage.setItem('pinnedGroups', JSON.stringify(groups));
+        }
+        function pinCurrentGroup() {
+            const groupId = currentGroupId;
+            if (!groupId) return;
+            let groups = getPinnedGroups();
+            if (!groups.includes(groupId)) {
+                groups.push(groupId);
+                setPinnedGroups(groups);
+                renderPinnedGroups();
+            }
+        }
+        function unpinGroup(groupId) {
+            let groups = getPinnedGroups();
+            groups = groups.filter(id => id !== groupId);
+            setPinnedGroups(groups);
+            renderPinnedGroups();
+        }
+        function loadPinnedGroup(groupId) {
+            document.getElementById('groupIdInput').value = groupId;
+            fetchGames();
+        }
+        function renderPinnedGroups() {
+            const list = document.getElementById('pinnedGroupsList');
+            list.innerHTML = '';
+            const pinned = getPinnedGroups();
+            if (pinned.length === 0) {
+                list.innerHTML = '<span style="opacity: 0.6;">No pinned groups yet.</span>';
+                return;
+            }
+            pinned.forEach((id, index) => {
+                const div = document.createElement('div');
+                div.className = 'pinnedItem';
+                div.innerHTML = `
+                    <span>[${index + 1}] &lt;!DOCTYPE html&gt;</span>
+                    <div>
+                        <button class="btn-blue" onclick="loadPinnedGroup('${id}')">View</button>
+                        <button class="btn-red" onclick="unpinGroup('${id}')">🗑️</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
         function toggleTheme() {
             const body = document.body;
-            const theme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            body.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
+            const isDark = body.style.background === 'black' || body.style.background === '#000';
+            body.style.background = isDark ? '#fff' : '#000';
+            body.style.color = isDark ? '#000' : '#fff';
         }
-        function filterGames() {
-            const filter = document.getElementById('searchFilter').value.toLowerCase();
+        function searchGames() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
             const cards = document.querySelectorAll('.gameCard');
             cards.forEach(card => {
-                const title = card.querySelector('h2').textContent.toLowerCase();
-                card.style.display = title.includes(filter) ? 'block' : 'none';
+                const text = card.innerText.toLowerCase();
+                card.style.display = text.includes(input) ? 'block' : 'none';
             });
         }
         async function fetchGames() {
-            const groupId = document.getElementById('groupIdInput').value;
+            const groupId = document.getElementById('groupIdInput').value.trim();
             const container = document.getElementById('gamesContainer');
-            const spinner = document.getElementById('loadingSpinner');
-            const noGames = document.getElementById('noGames');
-            container.innerHTML = '';
-            spinner.style.display = 'block';
+            const pinWrapper = document.getElementById('pinGroupWrapper');
+            currentGroupId = groupId;
+            if (groupId) {
+                pinWrapper.style.display = 'inline-block';
+            } else {
+                pinWrapper.style.display = 'none';
+                return;
+            }
+            container.innerHTML = 'Loading...';
             try {
                 const response = await fetch(`https://mskswokcev.devrahsanko.workers.dev/?groupId=${groupId}`);
                 if (!response.ok) throw new Error('Failed to fetch data');
                 const data = await response.json();
                 const games = data.games || [];
-                spinner.style.display = 'none';
                 if (games.length === 0) {
-                    container.innerHTML = '';
-                    container.appendChild(noGames);
-                    noGames.style.display = 'block';
+                    container.innerHTML = 'No games found for this group.';
                     return;
                 }
-                noGames.style.display = 'none';
+                container.innerHTML = '';
                 games.forEach(game => {
                     const { name, description, rootPlaceId } = game;
                     const card = document.createElement('div');
@@ -209,10 +211,14 @@
                 });
             } catch (error) {
                 console.error('Error fetching games:', error);
-                spinner.style.display = 'none';
-                container.innerHTML = '<div id="noGames">Error loading games. Please try again later.</div>';
+                container.innerHTML = 'Error loading games. Please try again later.';
             }
         }
+        // Initialize pinned groups on load
+        window.onload = () => {
+            renderPinnedGroups();
+            fetchGames(); // Auto-load last entered group if any
+        };
     </script>
 </body>
 </html>
