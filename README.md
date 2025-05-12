@@ -301,7 +301,7 @@
                 }
                 container.innerHTML = '';
                 games.forEach(game => {
-                    const { name, description, placeId, } = game;
+                    const { name, description, placeId } = game;
                     const card = document.createElement('div');
                     card.className = 'gameCard';
                     card.innerHTML = `
