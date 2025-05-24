@@ -307,7 +307,7 @@
                     card.innerHTML = `
                         <h2>${name}</h2>
                         <p><strong>Description:</strong> ${description || 'No description available.'}</p>
-                        <a href="https://www.roblox.com/games/${rootPlace}" target="_blank">Play Game</a>
+                        <a href="https://www.roblox.com/games/${placeId}" target="_blank">Play Game</a>
                     `;
                     container.appendChild(card);
                 });
